@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vault — Juice WRLD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;--border:#2a2a38;
+  --accent:#9b5cf6;--text:#f0eeff;--muted:#8888aa;--dimmed:#444466;--red:#f472b6;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;line-height:1.5}
+.container{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* ── Header ── */
+.vault-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:.5rem}
+.vault-title{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:700;line-height:1;letter-spacing:-.02em}
+.vault-title .accent{color:var(--accent)}
+.vault-subtitle{font-size:14px;color:var(--muted);margin-top:.5rem;font-family:'Space Mono',monospace}
+
+/* ── Stats ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+.stat-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmed)}
+.stat-val{font-size:22px;font-weight:700;color:var(--text);margin-top:3px}
+.stat-val em{color:var(--accent);font-style:normal}
+
+/* ── Controls ── */
+.controls{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--dimmed);pointer-events:none}
+#search{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 34px;font-size:13px;color:var(--text);font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color .15s}
+#search:focus{border-color:var(--accent)}
+#search::placeholder{color:var(--dimmed)}
+.filter-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-family:'Space Grotesk',sans-serif;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.sort-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;color:var(--muted);cursor:pointer;outline:none}
+.sort-select:focus{border-color:var(--accent)}
+
+/* ── View toggle ── */
+.view-toggle{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px}
+.view-btn{background:none;border:none;cursor:pointer;color:var(--dimmed);padding:4px 8px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.view-btn:hover{color:var(--text)}
+.view-btn.active{background:var(--accent);color:#fff}
+
+.count-line{font-size:12px;color:var(--dimmed);font-family:'Space Mono',monospace;margin-bottom:.75rem;padding-left:2px}
+
+/* ── Shared cover ── */
+.cover{border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;overflow:hidden;position:relative}
+.cover img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.cover-letter{position:relative;z-index:1;transition:opacity .15s}
+.cover.has-img .cover-letter{opacity:0}
+.feat-tag{display:inline-block;font-size:10px;font-family:'Space Mono',monospace;background:rgba(155,92,246,.15);color:var(--accent);border-radius:3px;padding:1px 5px;margin-left:5px;flex-shrink:0;white-space:nowrap}
+.heart-btn{background:none;border:none;cursor:pointer;color:var(--dimmed);padding:4px;line-height:1;transition:color .15s;display:flex;align-items:center;justify-content:center}
+.heart-btn:hover{color:var(--red)}
+.heart-btn.loved{color:var(--red)}
+
+/* ── LIST view ── */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;min-width:600px;table-layout:fixed}
+thead tr{border-bottom:1px solid var(--border)}
+th{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmed);padding:10px 12px;text-align:left;background:var(--surface);white-space:nowrap;overflow:hidden}
+th.r{text-align:right}th.c{text-align:center}
+col.col-num{width:42px}col.col-cover{width:52px}col.col-title{width:auto}
+col.col-album{width:220px}col.col-year{width:54px}col.col-plays{width:90px}
+col.col-dur{width:60px}col.col-heart{width:36px}
+tbody tr{border-bottom:1px solid #1a1a28;transition:background .1s;cursor:default}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+
+td{padding:9px 12px;vertical-align:middle;overflow:hidden}
+.num-cell{text-align:center}
+.play-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--dimmed)}
+.cover-cell{padding-right:4px}
+.cover-sm{width:40px;height:40px;font-size:13px}
+.title-cell{min-width:0}
+.track-name-inner{display:flex;align-items:center;min-width:0}
+.track-name-text{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
+.track-artist{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.album-cell{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.year-cell{font-family:'Space Mono',monospace;font-size:11px;color:var(--dimmed);white-space:nowrap;text-align:center}
+.plays-cell{text-align:right;white-space:nowrap}
+.plays-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.plays-bar-bg{height:2px;background:#2a2a38;border-radius:2px;margin-top:4px}
+.plays-bar{height:2px;background:var(--accent);border-radius:2px}
+.dur-cell{text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:var(--dimmed);white-space:nowrap}
+.heart-cell{text-align:center}
+.heart-cell .heart-btn{margin:0 auto}
+
+/* ── GRID view ── */
+.grid-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.grid-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:default;transition:border-color .15s,background .15s;display:flex;flex-direction:column}
+.grid-card:hover{border-color:var(--accent);background:var(--surface2)}
+.cover-lg{width:100%;aspect-ratio:1;font-size:2rem;border-radius:0;position:relative}
+.cover-lg img{border-radius:0}
+.grid-body{padding:10px 10px 8px;flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.grid-title{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid-artist{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid-feat{display:block;font-size:10px;font-family:'Space Mono',monospace;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.grid-meta{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.grid-plays{font-family:'Space Mono',monospace;font-size:10px;color:var(--dimmed)}
+
+/* ── States ── */
+.state-msg{text-align:center;padding:4rem 1rem;font-family:'Space Mono',monospace;font-size:13px}
+.state-msg.loading{color:var(--muted)}
+.state-msg.error{color:var(--red)}
+.empty{text-align:center;padding:3rem 1rem;color:var(--dimmed);font-size:14px;font-family:'Space Mono',monospace}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+@media(max-width:700px){
+  col.col-album{width:0}col.col-year{width:0}
+  .album-cell,.year-cell{display:none}
+  .grid-wrap{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="vault-header">
+  <div class="eyebrow">Personal Collection · 999</div>
+  <h1 class="vault-title">The <span class="accent">Vault</span></h1>
+  <p class="vault-subtitle" id="subtitle">loading…</p>
+</header>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Tracks</div><div class="stat-val" id="stat-tracks">—</div></div>
+  <div class="stat-card"><div class="stat-label">Total Plays</div><div class="stat-val" id="stat-plays">—</div></div>
+  <div class="stat-card"><div class="stat-label">Runtime</div><div class="stat-val" id="stat-runtime">—</div></div>
+</div>
+
+<div class="controls" id="controls" style="display:none">
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Search tracks, albums, artists…" autocomplete="off">
+  </div>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="feat">Features</button>
+  <button class="filter-btn" data-filter="solo">Solo</button>
+  <button class="filter-btn" data-filter="loved">❤ Loved</button>
+  <select class="sort-select" id="sort-select">
+    <option value="plays">Sort: Plays</option>
+    <option value="name">Sort: A–Z</option>
+    <option value="album">Sort: Album</option>
+    <option value="year">Sort: Year</option>
+    <option value="duration">Sort: Length</option>
+  </select>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btn-list" title="List view">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </button>
+    <button class="view-btn" id="btn-grid" title="Grid view">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="count-line" id="count-line" style="display:none"></div>
+
+<div id="state-wrap">
+  <div class="state-msg loading" id="state-msg">fetching tracks…</div>
+</div>
+
+<!-- LIST -->
+<div class="table-wrap" id="table-wrap" style="display:none">
+  <table>
+    <colgroup>
+      <col class="col-num"><col class="col-cover"><col class="col-title">
+      <col class="col-album"><col class="col-year"><col class="col-plays">
+      <col class="col-dur"><col class="col-heart">
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="c">#</th><th></th><th>Title</th>
+        <th>Album / Project</th><th class="c">Year</th>
+        <th class="r">Plays</th><th class="r">Len</th><th></th>
+      </tr>
+    </thead>
+    <tbody id="track-body"></tbody>
+  </table>
+  <div class="empty" id="empty-list" style="display:none">No tracks found.</div>
+</div>
+
+<!-- GRID -->
+<div class="grid-wrap" id="grid-wrap" style="display:none"></div>
+<div class="empty" id="empty-grid" style="display:none">No tracks found.</div>
+
+</div>
+<script>
+const CSV_URL = 'https://raw.githubusercontent.com/sqep/23123123/refs/heads/main/juice_comp_clean.xlsx%20-%20Tracks.csv';
+const COVERS_DIR = './covers/';
+
+// ── Cover art ─────────────────────────────────────────────────────────────────
+function nameToCoverStem(name) { return name.replace(/\*/g, '_'); }
+
+function coverEl(album, name, size) {
+  const c = ALBUM_COLORS[album] || ['#18181f','#9b5cf6'];
+  const letter = (name[0] || '?').toUpperCase();
+  const stem = nameToCoverStem(name);
+  const cls = size === 'lg' ? 'cover cover-lg' : 'cover cover-sm';
+  const imgHtml = `<img
+    src="${COVERS_DIR}${encodeURIComponent(stem)}.jpg"
+    onload="this.parentElement.classList.add('has-img')"
+    onerror="this._triedPng?this.remove():(this._triedPng=true,this.src='${COVERS_DIR}${encodeURIComponent(stem)}.png')"
+    alt="">`;
+  return `<div class="${cls}" style="background:${c[0]};color:${c[1]}"><span class="cover-letter">${letter}</span>${imgHtml}</div>`;
+}
+
+// ── CSV parser ────────────────────────────────────────────────────────────────
+function splitCSVLine(line) {
+  const result = []; let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { if (inQ && line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ; }
+    else if (ch===',' && !inQ){result.push(cur);cur='';}
+    else cur+=ch;
+  }
+  result.push(cur); return result;
+}
+function parseCSV(text) {
+  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  const headers = splitCSVLine(lines[0]);
+  const rows = [];
+  for (let i=1;i<lines.length;i++){
+    const line=lines[i].trim(); if(!line)continue;
+    const vals=splitCSVLine(line), obj={};
+    headers.forEach((h,idx)=>{obj[h.trim()]=(vals[idx]||'').trim();});
+    rows.push(obj);
+  }
+  return rows;
+}
+
+// ── Feature extraction ────────────────────────────────────────────────────────
+const FEAT_RE = /\s*[\(\[]\s*(?:ft\.?|feat\.?|featuring|with)\s+(.+?)[\)\]]/i;
+function parseFeat(rawName, rawArtist) {
+  const m = FEAT_RE.exec(rawName);
+  const cleanName = m ? rawName.replace(FEAT_RE,'').trim() : rawName;
+  const nameFeats = m ? m[1].split(',').map(s=>s.trim()) : [];
+  const artistParts = rawArtist.split(',').map(s=>s.trim());
+  const mainArtist = artistParts[0], artistFeats = artistParts.slice(1);
+  const seen=new Set(), allFeats=[];
+  for(const f of [...nameFeats,...artistFeats]){const k=f.toLowerCase();if(!seen.has(k)){seen.add(k);allFeats.push(f);}}
+  return {cleanName, mainArtist, feat:allFeats.join(', ')};
+}
+function secsToStr(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return`${m}:${sec.toString().padStart(2,'0')}`;}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let TRACKS=[], ALBUM_COLORS={}, MAX_PLAYS=1;
+let lovedState={}, activeFilter='all', activeSort='plays', searchQ='', activeView='list';
+
+const PALETTE=[
+  ['#1a0826','#a78bfa'],['#1a0a14','#f472b6'],['#0a1220','#60a5fa'],
+  ['#0d1f14','#34d399'],['#1f0a0a','#f87171'],['#130a1f','#c084fc'],
+  ['#1a1208','#fbbf24'],['#08141f','#38bdf8'],['#0a1a12','#4ade80'],
+  ['#1f0a14','#fb7185'],['#0a0f1f','#818cf8'],['#1a0808','#f97316'],
+  ['#081a14','#2dd4bf'],['#180a1a','#e879f9'],['#1a1a0a','#a3e635'],
+  ['#0a1818','#22d3ee'],['#1f1208','#fb923c'],['#0a0a1f','#a5b4fc'],
+  ['#120a1f','#d946ef'],['#1f1a08','#facc15'],['#08180a','#86efac'],
+  ['#180808','#fca5a5'],['#081208','#6ee7b7'],['#1a0818','#f9a8d4'],
+  ['#08101a','#93c5fd'],['#0a1a0a','#bbf7d0'],['#18080a','#fcd34d'],
+  ['#080a1f','#c7d2fe'],['#14080a','#fda4af'],['#0a1808','#d4f5e2'],
+  ['#181408','#fef08a'],['#080a18','#bfdbfe'],['#1a0a08','#fed7aa'],
+  ['#0a1414','#99f6e4'],['#14080a','#fbcfe8'],['#08141a','#bae6fd'],
+  ['#0a180a','#d9f99d'],['#181808','#fef9c3'],['#0a0818','#ddd6fe'],
+  ['#18080a','#fecdd3'],['#080818','#c7d2fe'],['#0a1008','#bbf7d0'],
+  ['#140808','#fde68a'],['#080a14','#e0e7ff'],
+];
+
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+async function fetchAndLoad() {
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    processCSV(await res.text());
+  } catch(err) {
+    document.getElementById('state-msg').className='state-msg error';
+    document.getElementById('state-msg').innerHTML=`Failed to load tracks: ${err.message}<br><small>Check that the GitHub repo and file are public.</small>`;
+    document.getElementById('subtitle').textContent='error loading tracks';
+  }
+}
+
+function processCSV(text) {
+  const rows = parseCSV(text), parsed=[];
+  for(const row of rows){
+    const rawName=(row['Name']||'').trim(), rawArtist=(row['Artist']||'').trim();
+    if(!rawName)continue;
+    const {cleanName,mainArtist,feat}=parseFeat(rawName,rawArtist);
+    const timeSecs=parseFloat(row['Time']||'0');
+    parsed.push({
+      name:cleanName, artist:mainArtist, feat,
+      album:(row['Album']||'').trim(),
+      duration:isNaN(timeSecs)?'0:00':secsToStr(timeSecs),
+      plays:parseInt(row['Play Count']||'0')||0,
+      loved:(row['Loved']||'').trim().toUpperCase()==='TRUE',
+      year:(row['Year']||'').trim()
+    });
+  }
+  parsed.sort((a,b)=>b.plays-a.plays);
+  TRACKS=parsed;
+  const albums=[...new Set(parsed.map(t=>t.album))].sort();
+  ALBUM_COLORS={};
+  albums.forEach((a,i)=>{ALBUM_COLORS[a]=PALETTE[i%PALETTE.length];});
+  MAX_PLAYS=Math.max(1,...parsed.map(t=>t.plays));
+  lovedState={};
+  parsed.forEach((t,i)=>{lovedState[i]=t.loved;});
+
+  const totalPlays=parsed.reduce((s,t)=>s+t.plays,0);
+  const totalSecs=parsed.reduce((s,t)=>{const[m,sec]=t.duration.split(':').map(Number);return s+m*60+sec;},0);
+  const h=Math.floor(totalSecs/3600),mn=Math.floor((totalSecs%3600)/60);
+  document.getElementById('stat-tracks').textContent=parsed.length;
+  document.getElementById('stat-plays').innerHTML=`<em>${totalPlays.toLocaleString()}</em>`;
+  document.getElementById('stat-runtime').innerHTML=`${h}h <em>${mn}m</em>`;
+  document.getElementById('subtitle').textContent=`${parsed.length} tracks · sorted by plays`;
+  document.getElementById('state-wrap').style.display='none';
+  document.getElementById('controls').style.display='flex';
+  document.getElementById('count-line').style.display='block';
+  render();
+}
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+function getFiltered() {
+  const q=searchQ.toLowerCase();
+  return TRACKS.map((t,i)=>({...t,_idx:i,_loved:lovedState[i]})).filter(t=>{
+    const mQ=!q||t.name.toLowerCase().includes(q)||t.album.toLowerCase().includes(q)
+      ||t.artist.toLowerCase().includes(q)||(t.feat&&t.feat.toLowerCase().includes(q));
+    const mF=activeFilter==='all'
+      ||(activeFilter==='feat'&&t.feat)
+      ||(activeFilter==='solo'&&!t.feat)
+      ||(activeFilter==='loved'&&t._loved);
+    return mQ&&mF;
+  });
+}
+function dToSecs(d){const[m,s]=d.split(':').map(Number);return m*60+s;}
+function getSorted(list){
+  return[...list].sort((a,b)=>{
+    if(activeSort==='plays')return b.plays-a.plays;
+    if(activeSort==='name')return a.name.localeCompare(b.name);
+    if(activeSort==='album')return a.album.localeCompare(b.album)||b.plays-a.plays;
+    if(activeSort==='year')return(b.year||'0').localeCompare(a.year||'0')||b.plays-a.plays;
+    if(activeSort==='duration')return dToSecs(b.duration)-dToSecs(a.duration);
+    return 0;
+  });
+}
+
+const H_ON=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+const H_OFF=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const filtered=getSorted(getFiltered());
+  document.getElementById('count-line').textContent=`Showing ${filtered.length} of ${TRACKS.length} tracks`;
+  document.getElementById('stat-tracks').textContent=filtered.length;
+
+  if(activeView==='list') renderList(filtered);
+  else renderGrid(filtered);
+}
+
+function renderList(filtered) {
+  document.getElementById('table-wrap').style.display = filtered.length ? 'block' : 'none';
+  document.getElementById('grid-wrap').style.display='none';
+  document.getElementById('empty-grid').style.display='none';
+
+  const tbody=document.getElementById('track-body');
+  if(!filtered.length){
+    tbody.innerHTML='';
+    document.getElementById('empty-list').style.display='block';
+    document.getElementById('table-wrap').style.display='none';
+    return;
+  }
+  document.getElementById('empty-list').style.display='none';
+  tbody.innerHTML=filtered.map((t,rank)=>{
+    const pct=Math.round((t.plays/MAX_PLAYS)*100);
+    const featHtml=t.feat?`<span class="feat-tag">ft.&nbsp;${t.feat}</span>`:'';
+    return`<tr>
+      <td class="num-cell"><span class="play-num">${rank+1}</span></td>
+      <td class="cover-cell">${coverEl(t.album,t.name,'sm')}</td>
+      <td class="title-cell">
+        <div class="track-name-inner"><span class="track-name-text">${t.name}</span>${featHtml}</div>
+        <div class="track-artist">${t.artist}</div>
+      </td>
+      <td class="album-cell">${t.album}</td>
+      <td class="year-cell">${t.year||'—'}</td>
+      <td class="plays-cell">
+        <div class="plays-num">${t.plays.toLocaleString()}</div>
+        <div class="plays-bar-bg"><div class="plays-bar" style="width:${pct}%"></div></div>
+      </td>
+      <td class="dur-cell">${t.duration}</td>
+      <td class="heart-cell"><button class="heart-btn${t._loved?' loved':''}" data-idx="${t._idx}">${t._loved?H_ON:H_OFF}</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderGrid(filtered) {
+  document.getElementById('table-wrap').style.display='none';
+  document.getElementById('empty-list').style.display='none';
+
+  const wrap=document.getElementById('grid-wrap');
+  if(!filtered.length){
+    wrap.style.display='none';
+    document.getElementById('empty-grid').style.display='block';
+    return;
+  }
+  document.getElementById('empty-grid').style.display='none';
+  wrap.style.display='grid';
+  wrap.innerHTML=filtered.map(t=>{
+    const featHtml=t.feat?`<span class="grid-feat">ft. ${t.feat}</span>`:'';
+    return`<div class="grid-card">
+      <div style="position:relative">${coverEl(t.album,t.name,'lg')}</div>
+      <div class="grid-body">
+        <div class="grid-title">${t.name}</div>
+        <div class="grid-artist">${t.artist}</div>
+        ${featHtml}
+        <div class="grid-meta">
+          <span class="grid-plays">${t.plays.toLocaleString()} plays</span>
+          <button class="heart-btn${t._loved?' loved':''}" data-idx="${t._idx}">${t._loved?H_ON:H_OFF}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.value;render();});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');activeFilter=btn.dataset.filter;render();
+  });
+});
+document.getElementById('sort-select').addEventListener('change',e=>{activeSort=e.target.value;render();});
+
+document.getElementById('btn-list').addEventListener('click',()=>{
+  activeView='list';
+  document.getElementById('btn-list').classList.add('active');
+  document.getElementById('btn-grid').classList.remove('active');
+  render();
+});
+document.getElementById('btn-grid').addEventListener('click',()=>{
+  activeView='grid';
+  document.getElementById('btn-grid').classList.add('active');
+  document.getElementById('btn-list').classList.remove('active');
+  render();
+});
+
+// Heart clicks — works for both list and grid via event delegation
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.heart-btn');
+  if(btn&&btn.dataset.idx!==undefined){
+    const idx=parseInt(btn.dataset.idx);
+    lovedState[idx]=!lovedState[idx];
+    render();
+  }
+});
+
+fetchAndLoad();
+</script>
+</body>
+</html>
