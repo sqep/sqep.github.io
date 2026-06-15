@@ -58,18 +58,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .filter-pill:hover{background:rgba(255,255,255,.13);color:var(--text)}
 .filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
-/* ── Cover shared ── */
-.cover{border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;overflow:hidden;position:relative;min-width:0}
+/* small cover (list rows) */
+.cover{border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;overflow:hidden;position:relative}
 .cover img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;display:block}
 .cover-letter{position:relative;z-index:1;transition:opacity .15s;font-size:13px}
 .cover.has-img .cover-letter{opacity:0}
 .cover-sm{width:38px;height:38px}
-.cover-lg{width:100%;aspect-ratio:1/1;font-size:2.5rem;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.5);margin-bottom:10px;min-width:0;min-height:0}
+/* large cover (grid cards) — standalone, not combined with .cover */
+.cover-lg{display:block;width:100%;aspect-ratio:1/1;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.5);margin-bottom:10px;overflow:hidden;position:relative;font-size:2.5rem;font-weight:600;background:#1a1a1a;color:#fff}
+.cover-lg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;display:block}
+.cover-lg .cover-letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+.cover-lg.has-img .cover-letter{opacity:0}
 
 /* ── LIST ── */
-.list-wrap{padding:0 4px}
+.list-wrap{padding:0 4px;overflow-x:hidden}
 table{width:100%;border-collapse:collapse}
-thead th{font-size:11px;font-weight:500;color:var(--dim);letter-spacing:.04em;text-transform:uppercase;padding:6px 12px 8px;text-align:left;border-bottom:1px solid var(--border)}
+thead th{font-size:11px;font-weight:500;color:var(--dim);letter-spacing:.04em;text-transform:uppercase;padding:6px 12px 8px;text-align:left;border-bottom:1px solid var(--border);overflow:hidden;white-space:nowrap}
+thead th.th-cover{padding:6px 6px 8px 12px}
 th.r{text-align:right}th.c{text-align:center}
 col.col-num{width:40px}col.col-cover{width:50px}col.col-title{width:auto}
 col.col-album{width:200px}col.col-plays{width:80px}col.col-dur{width:56px}col.col-heart{width:34px}
@@ -91,9 +96,8 @@ td{padding:8px 12px;vertical-align:middle}
 .plays-num{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
 .plays-bar-bg{height:1.5px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:4px}
 .plays-bar{height:1.5px;background:rgba(252,60,68,.6);border-radius:2px}
-.heart-btn{background:none;border:none;cursor:pointer;color:var(--dim);padding:4px;display:flex;align-items:center;justify-content:center;transition:color .15s;margin:0 auto}
-.heart-btn:hover{color:var(--accent)}
-.heart-btn.loved{color:var(--accent)}
+.heart-icon{color:var(--accent);display:flex;align-items:center;justify-content:center;padding:4px;margin:0 auto;opacity:0}
+.heart-icon.loved{opacity:1}
 
 /* ── GRID ── */
 .grid-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;padding:4px 0}
@@ -102,7 +106,9 @@ td{padding:8px 12px;vertical-align:middle}
 .grid-card-title{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .15s;margin-bottom:2px}
 .grid-card-sub{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .grid-card-feat{font-size:11px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.grid-card-plays{font-size:11px;color:var(--dim);margin-top:4px;display:flex;align-items:center;justify-content:space-between}
+.grid-card-plays{font-size:11px;color:var(--dim);margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:4px}
+.grid-heart{color:var(--accent);display:flex;align-items:center;flex-shrink:0;opacity:0}
+.grid-heart.loved{opacity:1}
 
 /* ── ALBUMS grid ── */
 .albums-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;padding:4px 0}
@@ -137,9 +143,40 @@ td{padding:8px 12px;vertical-align:middle}
 .empty{text-align:center;padding:4rem 1rem;color:var(--dim);font-size:14px}
 
 ::-webkit-scrollbar{width:0}
+html,body{overflow-x:hidden}
 
 @media(max-width:700px){
-  col.col-album{width:0}.album-col{display:none}
+  /* top bar */
+  .top-bar{padding:0 14px;gap:8px}
+  #search{width:120px}
+  #search:focus{width:140px}
+  .sort-select{display:none}
+
+  /* hero */
+  .page-hero{padding:20px 0 16px;gap:14px}
+  .hero-cover{width:110px;height:110px;font-size:36px}
+  .hero-name{font-size:22px}
+  .hero-meta{font-size:11px}
+
+  /* page */
+  .page-content{padding:0 12px 60px}
+
+  /* table */
+  col.col-num{width:0}
+  .col-num-td,.th-num{display:none}
+  col.col-album{width:0}
+  .album-col,.th-album{display:none}
+  col.col-plays{width:0}
+  .plays-col,.th-plays{display:none}
+  col.col-cover{width:42px}
+  col.col-dur{width:42px}
+  col.col-heart{width:26px}
+  td{padding:7px 4px}
+  thead th{padding:5px 4px 7px;letter-spacing:0;font-size:10px}
+  thead th.th-cover{padding:5px 4px 7px}
+  .track-name-text{max-width:160px}
+
+  /* grid */
   .grid-wrap,.albums-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
@@ -202,7 +239,7 @@ td{padding:8px 12px;vertical-align:middle}
           <col class="col-album"><col class="col-plays"><col class="col-dur"><col class="col-heart">
         </colgroup>
         <thead>
-          <tr><th class="c">#</th><th></th><th>Title</th><th>Album</th><th class="r">Plays</th><th class="r">Time</th><th></th></tr>
+          <tr><th class="c col-num-td th-num">#</th><th class="th-cover"></th><th>Title</th><th class="th-album">Album</th><th class="r th-plays">Plays</th><th class="r">Time</th><th class="heart-col"></th></tr>
         </thead>
         <tbody id="track-body"></tbody>
       </table>
@@ -239,7 +276,7 @@ td{padding:8px 12px;vertical-align:middle}
             <col class="col-plays"><col class="col-dur"><col class="col-heart">
           </colgroup>
           <thead>
-            <tr><th class="c">#</th><th></th><th>Title</th><th class="r">Plays</th><th class="r">Time</th><th></th></tr>
+            <tr><th class="c col-num-td th-num">#</th><th class="th-cover"></th><th>Title</th><th class="r th-plays">Plays</th><th class="r">Time</th><th class="heart-col"></th></tr>
           </thead>
           <tbody id="detail-body"></tbody>
         </table>
@@ -263,10 +300,20 @@ function tryImg(el,jpgSrc,pngSrc,hasImgClass){
   img.src=jpgSrc;
 }
 
-function coverEl(album,name,cls){
+function coverEl(album,name){
   const c=ALBUM_COLORS[album]||['#1a1a1a','#ffffff30'];
   const l=(name[0]||'?').toUpperCase(),s=stemName(name),enc=encodeURIComponent(s);
-  return`<div class="cover ${cls}" style="background:${c[0]};color:${c[1]}">
+  return`<div class="cover cover-sm" style="background:${c[0]};color:${c[1]}">
+    <span class="cover-letter">${l}</span>
+    <img src='${COVERS_DIR}${enc}.jpg' onload='this.parentElement.classList.add("has-img")'
+      onerror='if(this._p){this.remove()}else{this._p=true;this.src="${COVERS_DIR}${enc}.png"}' alt=''>
+  </div>`;
+}
+
+function coverLgEl(album,name){
+  const c=ALBUM_COLORS[album]||['#1a1a1a','#ffffff30'];
+  const l=(name[0]||'?').toUpperCase(),s=stemName(name),enc=encodeURIComponent(s);
+  return`<div class="cover-lg" style="background:${c[0]};color:${c[1]}">
     <span class="cover-letter">${l}</span>
     <img src='${COVERS_DIR}${enc}.jpg' onload='this.parentElement.classList.add("has-img")'
       onerror='if(this._p){this.remove()}else{this._p=true;this.src="${COVERS_DIR}${enc}.png"}' alt=''>
@@ -463,9 +510,9 @@ function openAlbum(albumName){
     const pct=Math.round((t.plays/MAX_PLAYS)*100);
     const feat=t.feat?`<span class="feat-tag">ft. ${t.feat}</span>`:'';
     return`<tr>
-      <td style="text-align:center"><div class="row-num-wrap"><span class="row-num">${rank+1}</span></div></td>
-      <td style="padding-right:6px">${coverEl(t.album,t.name,'cover-sm')}</td>
-      <td style="min-width:0">
+      <td class="col-num-td" style="text-align:center"><div class="row-num-wrap"><span class="row-num">${rank+1}</span></div></td>
+      <td style="padding-right:6px">${coverEl(t.album,t.name)}</td>
+      <td class="title-td">
         <div class="track-name"><span class="track-name-text">${t.name}</span>${feat}</div>
         <div class="track-sub">${t.artist}</div>
       </td>
@@ -474,7 +521,7 @@ function openAlbum(albumName){
         <div class="plays-bar-bg"><div class="plays-bar" style="width:${pct}%"></div></div>
       </td>
       <td class="dur-col">${t.duration}</td>
-      <td><button class="heart-btn${t._loved?' loved':''}" data-idx="${t._idx}">${t._loved?H_ON:H_OFF}</button></td>
+      <td class="heart-col"><span class="heart-icon${t._loved?' loved':''}">${H_ON}</span></td>
     </tr>`;
   }).join('');
 
@@ -530,13 +577,13 @@ function renderList(filtered){
     const pct=Math.round((t.plays/MAX_PLAYS)*100);
     const feat=t.feat?`<span class="feat-tag">ft. ${t.feat}</span>`:'';
     return`<tr>
-      <td style="text-align:center"><div class="row-num-wrap"><span class="row-num">${rank+1}</span></div></td>
-      <td style="padding-right:6px">${coverEl(t.album,t.name,'cover-sm')}</td>
-      <td style="min-width:0"><div class="track-name"><span class="track-name-text">${t.name}</span>${feat}</div><div class="track-sub">${t.artist}</div></td>
+      <td class="col-num-td" style="text-align:center"><div class="row-num-wrap"><span class="row-num">${rank+1}</span></div></td>
+      <td style="padding-right:6px">${coverEl(t.album,t.name)}</td>
+      <td class="title-td"><div class="track-name"><span class="track-name-text">${t.name}</span>${feat}</div><div class="track-sub">${t.artist}</div></td>
       <td class="album-col">${t.album}</td>
       <td class="plays-col"><div class="plays-num">${t.plays.toLocaleString()}</div><div class="plays-bar-bg"><div class="plays-bar" style="width:${pct}%"></div></div></td>
       <td class="dur-col">${t.duration}</td>
-      <td><button class="heart-btn${t._loved?' loved':''}" data-idx="${t._idx}">${t._loved?H_ON:H_OFF}</button></td>
+      <td class="heart-col"><span class="heart-icon${t._loved?' loved':''}">${H_ON}</span></td>
     </tr>`;
   }).join('');
 }
@@ -548,10 +595,10 @@ function renderGrid(filtered){
   document.getElementById('empty-grid').style.display='none';wrap.style.display='grid';
   wrap.innerHTML=filtered.map(t=>{
     const feat=t.feat?`<div class="grid-card-feat">ft. ${t.feat}</div>`:'';
-    return`<div class="grid-card">${coverEl(t.album,t.name,'cover cover-lg')}
+    return`<div class="grid-card">${coverLgEl(t.album,t.name)}
       <div class="grid-card-title">${t.name}</div><div class="grid-card-sub">${t.artist}</div>${feat}
       <div class="grid-card-plays"><span>${t.plays.toLocaleString()} plays</span>
-        <button class="heart-btn${t._loved?' loved':''}" data-idx="${t._idx}">${t._loved?H_ON:H_OFF}</button>
+        <span class="grid-heart${t._loved?' loved':''}">${H_ON}</span>
       </div></div>`;
   }).join('');
 }
@@ -597,24 +644,6 @@ document.getElementById('albums-grid').addEventListener('click',e=>{
 
 // Back button
 document.getElementById('back-btn').addEventListener('click',closeAlbum);
-
-// Heart clicks
-document.addEventListener('click',e=>{
-  const btn=e.target.closest('.heart-btn');
-  if(btn&&btn.dataset.idx!==undefined){
-    const idx=parseInt(btn.dataset.idx);lovedState[idx]=!lovedState[idx];
-    // re-render whichever is visible
-    if(activeTab==='songs')render();
-    else{
-      // re-render detail if open
-      const detail=document.getElementById('album-detail');
-      if(detail.classList.contains('visible')){
-        const name=document.getElementById('detail-name').textContent;
-        openAlbum(name);
-      }
-    }
-  }
-});
 
 fetchAndLoad();
 </script>
